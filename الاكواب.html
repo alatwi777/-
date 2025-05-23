@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تتبع عدد الأكواب</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .header-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        #cupInput {
+            width: 150px;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        #addButton {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        #addButton:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: left;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .other-select {
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            width: 70px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>بوفية شقف تبوك</h1>
+        <img src="https://png.pngtree.com/background/20230410/original/pngtree-milk-tea-strawberry-blueberry-delicious-background-picture-image_2384403.jpg" alt="خلفية مشروبات" class="header-image">
+        
+        <div class="input-group">
+            <select id="cupInput">
+                <option value="0">0 كوب</option>
+                <option value="1">1 كوب</option>
+                <option value="2">2 كوب</option>
+                <option value="3">3 كوب</option>
+                <option value="4">4 كوب</option>
+                <option value="5">5 كوب</option>
+                <option value="6">6 كوب</option>
+                <option value="7">7 كوب</option>
+                <option value="8">8 كوب</option>
+                <option value="9">9 كوب</option>
+                <option value="10">10 كوب</option>
+            </select>
+            <button id="addButton">إضافة</button>
+        </div>
+        
+        <table id="cupsTable">
+            <thead>
+                <tr>
+                    <th>عدد الأكواب</th>
+                    <th>التاريخ واليوم</th>
+                    <th>المجموع</th>
+                    <th>أخرى</th>
+                    <th>حذف</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- الصفوف ستضاف هنا -->
+            </tbody>
+        </table>
+        
+        <div class="total">المجموع الكلي: <span id="grandTotal">0</span> ريال</div>
+    </div>
+
+    <script>
+        // تحميل البيانات المحفوظة عند فتح الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedData();
+            updateGrandTotal();
+        });
+
+        // دالة لتحميل البيانات المحفوظة
+        function loadSavedData() {
+            const savedData = localStorage.getItem('cupsData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                data.forEach(item => {
+                    addRowToTable(item.cups, item.date, item.day, item.total, item.other, false);
+                });
+            }
+        }
+
+        // دالة لحفظ البيانات
+        function saveData() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            const data = [];
+            
+            rows.forEach(row => {
+                data.push({
+                    cups: row.cells[0].textContent,
+                    date: row.cells[1].textContent.split(' - ')[0],
+                    day: row.cells[1].textContent.split(' - ')[1],
+                    total: row.cells[2].textContent.replace(' ريال', ''),
+                    other: row.cells[3].querySelector('select').value
+                });
+            });
+            
+            localStorage.setItem('cupsData', JSON.stringify(data));
+        }
+
+        // دالة لإضافة صف جديد للجدول
+        function addRowToTable(cups, date, day, total, other = 0, shouldSave = true) {
+            const tableBody = document.getElementById('tableBody');
+            const newRow = tableBody.insertRow();
+            
+            newRow.innerHTML = `
+                <td>${cups}</td>
+                <td>${date} - ${day}</td>
+                <td>${total} ريال</td>
+                <td>
+                    <select class="other-select" onchange="updateRowTotal(this)">
+                        <option value="0" ${other == 0 ? 'selected' : ''}>0</option>
+                        <option value="1" ${other == 1 ? 'selected' : ''}>1</option>
+                        <option value="2" ${other == 2 ? 'selected' : ''}>2</option>
+                        <option value="3" ${other == 3 ? 'selected' : ''}>3</option>
+                        <option value="4" ${other == 4 ? 'selected' : ''}>4</option>
+                        <option value="5" ${other == 5 ? 'selected' : ''}>5</option>
+                        <option value="6" ${other == 6 ? 'selected' : ''}>6</option>
+                        <option value="7" ${other == 7 ? 'selected' : ''}>7</option>
+                        <option value="8" ${other == 8 ? 'selected' : ''}>8</option>
+                        <option value="9" ${other == 9 ? 'selected' : ''}>9</option>
+                        <option value="10" ${other == 10 ? 'selected' : ''}>10</option>
+                    </select>
+                </td>
+                <td><button class="delete-btn" onclick="deleteRow(this)">حذف</button></td>
+            `;
+            
+            // تحديث المجموع للصف الجديد
+            updateRowTotal(newRow.cells[3].querySelector('select'));
+            
+            if (shouldSave) {
+                saveData();
+                updateGrandTotal();
+            }
+        }
+
+        // دالة لتحديث المجموع للصف عند تغيير قيمة "أخرى"
+        function updateRowTotal(selectElement) {
+            const row = selectElement.parentNode.parentNode;
+            const cups = parseFloat(row.cells[0].textContent);
+            const other = parseFloat(selectElement.value);
+            const total = (cups * 1.5 + other * 1).toFixed(2);
+            row.cells[2].textContent = total + ' ريال';
+            
+            saveData();
+            updateGrandTotal();
+        }
+
+        // دالة لحذف صف
+        function deleteRow(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            saveData();
+            updateGrandTotal();
+        }
+
+        // دالة لحساب المجموع الكلي
+        function updateGrandTotal() {
+            const totals = document.querySelectorAll('#tableBody tr td:nth-child(3)');
+            let grandTotal = 0;
+            
+            totals.forEach(totalCell => {
+                const value = parseFloat(totalCell.textContent.replace(' ريال', ''));
+                grandTotal += value;
+            });
+            
+            document.getElementById('grandTotal').textContent = grandTotal.toFixed(2);
+        }
+
+        // حدث النقر على زر الإضافة
+        document.getElementById('addButton').addEventListener('click', function() {
+            const cupInput = document.getElementById('cupInput');
+            const cups = cupInput.value;
+            
+            if (cups >= 0) {
+                const now = new Date();
+                const date = now.toLocaleDateString('ar-EG');
+                const day = now.toLocaleDateString('ar-EG', { weekday: 'long' });
+                const total = (cups * 1.5).toFixed(2);
+                
+                addRowToTable(cups, date, day, total);
+            }
+        });
+    </script>
+</body>
+</html>
