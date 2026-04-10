@@ -2,105 +2,248 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>تتبع عدد الأكواب</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            padding: 15px;
             background-color: #f5f5f5;
             margin: 0;
+            min-height: 100vh;
         }
+        
         .container {
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
             background-color: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 12px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+        
         h1 {
             color: #2c3e50;
             text-align: center;
             margin-bottom: 15px;
+            font-size: 1.5rem;
         }
+        
         .header-image {
             width: 100%;
-            max-height: 200px;
+            max-height: 150px;
             object-fit: cover;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: block;
         }
+        
         .input-group {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
-        #cupInput {
-            width: 150px;
-            padding: 8px 10px;
+        
+        .input-group select {
+            flex: 2;
+            min-width: 100px;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 14px;
+            background-color: white;
         }
-        #addButton {
-            padding: 8px 15px;
+        
+        .input-group button {
+            flex: 1;
+            min-width: 70px;
+            padding: 10px 15px;
             background-color: #3498db;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.3s;
         }
+        
+        .remaining-group {
+            flex: 2;
+            min-width: 120px;
+        }
+        
+        .remaining-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+        
+        .remaining-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
         #addButton:hover {
             background-color: #2980b9;
         }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            font-size: 13px;
         }
+        
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 10px 5px;
             text-align: center;
         }
+        
         th {
             background-color: #f2f2f2;
             font-weight: bold;
+            font-size: 13px;
         }
+        
+        td {
+            word-break: break-word;
+        }
+        
         .total {
             font-weight: bold;
-            font-size: 18px;
-            margin-top: 20px;
-            text-align: left;
+            font-size: 16px;
+            margin-top: 15px;
             padding: 10px;
             background-color: #f8f9fa;
-            border-radius: 5px;
+            border-radius: 8px;
+            text-align: center;
         }
+        
+        .remaining-total {
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e8f4fd;
+            border-radius: 8px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        
         .delete-btn {
             background-color: #e74c3c;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
+            padding: 6px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             transition: background-color 0.3s;
         }
+        
         .delete-btn:hover {
             background-color: #c0392b;
         }
+        
         .other-select {
             padding: 5px;
-            border-radius: 3px;
+            border-radius: 6px;
             border: 1px solid #ddd;
-            width: 70px;
-            font-size: 13px;
+            width: 55px;
+            font-size: 12px;
+        }
+        
+        /* تحسينات للايفون في الوضع الرأسي */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+                margin-bottom: 10px;
+            }
+            
+            .header-image {
+                max-height: 120px;
+            }
+            
+            .input-group {
+                gap: 6px;
+            }
+            
+            .input-group select,
+            .remaining-group input,
+            .input-group button {
+                font-size: 14px;
+                padding: 10px 8px;
+            }
+            
+            th {
+                font-size: 11px;
+                padding: 8px 3px;
+            }
+            
+            td {
+                font-size: 11px;
+                padding: 8px 3px;
+            }
+            
+            .other-select {
+                width: 50px;
+                font-size: 11px;
+                padding: 4px;
+            }
+            
+            .delete-btn {
+                padding: 5px 8px;
+                font-size: 10px;
+            }
+            
+            .total, .remaining-total {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+        
+        /* تحسينات للشاشات الصغيرة جداً */
+        @media screen and (max-width: 480px) {
+            th, td {
+                padding: 6px 2px;
+            }
+            
+            th {
+                font-size: 10px;
+            }
+            
+            td {
+                font-size: 10px;
+            }
+            
+            .other-select {
+                width: 45px;
+                font-size: 10px;
+            }
         }
     </style>
 </head>
@@ -123,25 +266,31 @@
                 <option value="9">9 كوب</option>
                 <option value="10">10 كوب</option>
             </select>
+            <div class="remaining-group">
+                <input type="number" id="remainingAmount" placeholder="المبلغ المتبقي" value="0" step="0.01">
+            </div>
             <button id="addButton">إضافة</button>
         </div>
         
-        <table id="cupsTable">
-            <thead>
-                <tr>
-                    <th>عدد الأكواب</th>
-                    <th>التاريخ واليوم</th>
-                    <th>المجموع</th>
-                    <th>أخرى</th>
-                    <th>حذف</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- الصفوف ستضاف هنا -->
-            </tbody>
-        </table>
+        <div class="table-wrapper">
+            <table id="cupsTable">
+                <thead>
+                    <tr>
+                        <th>عدد الأكواب</th>
+                        <th>التاريخ واليوم</th>
+                        <th>المجموع</th>
+                        <th>أخرى</th>
+                        <th>حذف</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- الصفوف ستضاف هنا -->
+                </tbody>
+            </table>
+        </div>
         
         <div class="total">المجموع الكلي: <span id="grandTotal">0</span> ريال</div>
+        <div class="remaining-total">المبلغ المتبقي: <span id="remainingTotal">0</span> ريال</div>
     </div>
 
     <script>
@@ -149,10 +298,42 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadSavedData();
             updateGrandTotal();
+            updateRemainingDisplay();
+            
+            // إضافة مستمع للتغيرات في حقل المبلغ المتبقي
+            const remainingInput = document.getElementById('remainingAmount');
+            remainingInput.addEventListener('input', function() {
+                saveRemainingAmount();
+                updateRemainingDisplay();
+            });
         });
+
+        // دالة لحفظ المبلغ المتبقي
+        function saveRemainingAmount() {
+            const remainingAmount = document.getElementById('remainingAmount').value;
+            localStorage.setItem('remainingAmount', remainingAmount);
+        }
+        
+        // دالة لتحميل المبلغ المتبقي المحفوظ
+        function loadRemainingAmount() {
+            const savedRemaining = localStorage.getItem('remainingAmount');
+            if (savedRemaining !== null) {
+                document.getElementById('remainingAmount').value = savedRemaining;
+            }
+        }
+        
+        // دالة لتحديث عرض المبلغ المتبقي
+        function updateRemainingDisplay() {
+            const remainingAmount = parseFloat(document.getElementById('remainingAmount').value) || 0;
+            const grandTotal = parseFloat(document.getElementById('grandTotal').textContent) || 0;
+            const remainingTotal = remainingAmount - grandTotal;
+            document.getElementById('remainingTotal').textContent = remainingTotal.toFixed(2);
+        }
 
         // دالة لتحميل البيانات المحفوظة
         function loadSavedData() {
+            loadRemainingAmount();
+            
             const savedData = localStorage.getItem('cupsData');
             if (savedData) {
                 const data = JSON.parse(savedData);
@@ -178,6 +359,16 @@
             });
             
             localStorage.setItem('cupsData', JSON.stringify(data));
+        }
+
+        // دالة للحصول على التاريخ بالصيغة المطلوبة (مثال: 10 ابريل الجمعة)
+        function getFormattedDate() {
+            const now = new Date();
+            const day = now.getDate();
+            const month = now.toLocaleDateString('ar-EG', { month: 'long' });
+            const weekday = now.toLocaleDateString('ar-EG', { weekday: 'long' });
+            
+            return `${day} ${month} ${weekday}`;
         }
 
         // دالة لإضافة صف جديد للجدول
@@ -213,6 +404,7 @@
             if (shouldSave) {
                 saveData();
                 updateGrandTotal();
+                updateRemainingDisplay();
             }
         }
 
@@ -226,6 +418,7 @@
             
             saveData();
             updateGrandTotal();
+            updateRemainingDisplay();
         }
 
         // دالة لحذف صف
@@ -234,6 +427,7 @@
             row.parentNode.removeChild(row);
             saveData();
             updateGrandTotal();
+            updateRemainingDisplay();
         }
 
         // دالة لحساب المجموع الكلي
@@ -255,12 +449,15 @@
             const cups = cupInput.value;
             
             if (cups >= 0) {
-                const now = new Date();
-                const date = now.toLocaleDateString('ar-EG');
-                const day = now.toLocaleDateString('ar-EG', { weekday: 'long' });
+                const formattedDate = getFormattedDate();
+                // استخراج التاريخ واليوم من الصيغة الجديدة
+                const dateParts = formattedDate.split(' ');
+                const dayOfWeek = dateParts.pop();
+                const dateText = dateParts.join(' ');
+                
                 const total = (cups * 1.5).toFixed(2);
                 
-                addRowToTable(cups, date, day, total);
+                addRowToTable(cups, dateText, dayOfWeek, total);
             }
         });
     </script>
