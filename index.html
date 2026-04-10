@@ -52,7 +52,7 @@
         }
         
         .input-group select {
-            flex: 2;
+            flex: 1;
             min-width: 100px;
             padding: 10px;
             border: 1px solid #ddd;
@@ -62,7 +62,7 @@
         }
         
         .input-group button {
-            flex: 1;
+            flex: 0.5;
             min-width: 70px;
             padding: 10px 15px;
             background-color: #3498db;
@@ -75,7 +75,7 @@
         }
         
         .remaining-group {
-            flex: 2;
+            flex: 1;
             min-width: 120px;
         }
         
@@ -266,10 +266,10 @@
                 <option value="9">9 كوب</option>
                 <option value="10">10 كوب</option>
             </select>
+            <button id="addButton">إضافة</button>
             <div class="remaining-group">
                 <input type="number" id="remainingAmount" placeholder="المبلغ المتبقي" value="0" step="0.01">
             </div>
-            <button id="addButton">إضافة</button>
         </div>
         
         <div class="table-wrapper">
@@ -277,7 +277,7 @@
                 <thead>
                     <tr>
                         <th>عدد الأكواب</th>
-                        <th>التاريخ واليوم</th>
+                        <th>التاريخ واليوم والوقت</th>
                         <th>المجموع</th>
                         <th>أخرى</th>
                         <th>حذف</th>
@@ -290,7 +290,7 @@
         </div>
         
         <div class="total">المجموع الكلي: <span id="grandTotal">0</span> ريال</div>
-        <div class="remaining-total">المبلغ المتبقي: <span id="remainingTotal">0</span> ريال</div>
+        <div class="remaining-total">المبلغ المتبقي (ثابت): <span id="remainingTotal">0</span> ريال</div>
     </div>
 
     <script>
@@ -322,12 +322,11 @@
             }
         }
         
-        // دالة لتحديث عرض المبلغ المتبقي
+        // دالة لتحديث عرض المبلغ المتبقي (ثابت ولا يتغير)
         function updateRemainingDisplay() {
             const remainingAmount = parseFloat(document.getElementById('remainingAmount').value) || 0;
-            const grandTotal = parseFloat(document.getElementById('grandTotal').textContent) || 0;
-            const remainingTotal = remainingAmount - grandTotal;
-            document.getElementById('remainingTotal').textContent = remainingTotal.toFixed(2);
+            // المبلغ المتبقي يظهر كما هو دون خصم أي شيء
+            document.getElementById('remainingTotal').textContent = remainingAmount.toFixed(2);
         }
 
         // دالة لتحميل البيانات المحفوظة
@@ -338,7 +337,7 @@
             if (savedData) {
                 const data = JSON.parse(savedData);
                 data.forEach(item => {
-                    addRowToTable(item.cups, item.date, item.day, item.total, item.other, false);
+                    addRowToTable(item.cups, item.dateTime, item.total, item.other, false);
                 });
             }
         }
@@ -351,8 +350,7 @@
             rows.forEach(row => {
                 data.push({
                     cups: row.cells[0].textContent,
-                    date: row.cells[1].textContent.split(' - ')[0],
-                    day: row.cells[1].textContent.split(' - ')[1],
+                    dateTime: row.cells[1].textContent,
                     total: row.cells[2].textContent.replace(' ريال', ''),
                     other: row.cells[3].querySelector('select').value
                 });
@@ -371,14 +369,36 @@
             return `${day} ${month} ${weekday}`;
         }
 
+        // دالة للحصول على الوقت بالصيغة المطلوبة (مثال: 9:44 م)
+        function getFormattedTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'م' : 'ص';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // الساعة 12 تصبح 12 بدلاً من 0
+            
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+            
+            return `${hours}:${formattedMinutes} ${ampm}`;
+        }
+
+        // دالة للحصول على التاريخ والوقت كاملين
+        function getFormattedDateTime() {
+            const date = getFormattedDate();
+            const time = getFormattedTime();
+            return `${date} ${time}`;
+        }
+
         // دالة لإضافة صف جديد للجدول
-        function addRowToTable(cups, date, day, total, other = 0, shouldSave = true) {
+        function addRowToTable(cups, dateTime, total, other = 0, shouldSave = true) {
             const tableBody = document.getElementById('tableBody');
             const newRow = tableBody.insertRow();
             
             newRow.innerHTML = `
                 <td>${cups}</td>
-                <td>${date} - ${day}</td>
+                <td>${dateTime}</td>
                 <td>${total} ريال</td>
                 <td>
                     <select class="other-select" onchange="updateRowTotal(this)">
@@ -449,15 +469,10 @@
             const cups = cupInput.value;
             
             if (cups >= 0) {
-                const formattedDate = getFormattedDate();
-                // استخراج التاريخ واليوم من الصيغة الجديدة
-                const dateParts = formattedDate.split(' ');
-                const dayOfWeek = dateParts.pop();
-                const dateText = dateParts.join(' ');
-                
+                const dateTime = getFormattedDateTime();
                 const total = (cups * 1.5).toFixed(2);
                 
-                addRowToTable(cups, dateText, dayOfWeek, total);
+                addRowToTable(cups, dateTime, total);
             }
         });
     </script>
